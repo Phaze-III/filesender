@@ -41,7 +41,8 @@ importfile sl_SI FileSender_2.0_Slovenian.php
 importfile es_ES FileSender_2.0_Spanish.php
 
 echo "Checking syntax of generated .php files, please wait..."
+SyntaxOK="$(php -l /dev/null | sed 's%/dev/null%%')"
 for f in $(find ../../language -type f -name \*.php)
 do
-	php -l $f | grep -v '^No syntax errors detected in '
+	php -l $f | grep -v "^${SyntaxOK}"
 done
