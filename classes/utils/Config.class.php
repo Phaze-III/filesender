@@ -301,7 +301,22 @@ class Config
         if( strlen($themeName) && preg_match('@[./]@',$themeName)) {
             throw new ConfigBadParameterException('the theme config can not contain / or . characters');
         }
-            
+
+        if( self::get('terasender_enabled')) {
+            if( self::get('terasender_worker_count') < 1 || self::get('terasender_worker_count') > 30 ) {
+                throw new ConfigBadParameterException('terasender_worker_count must be between 1 and 30 inclusive.');
+            }
+        }
+
+        if( self::get('crypto_pbkdf2_expected_secure_to_year')) {
+            $y = self::get('crypto_pbkdf2_expected_secure_to_year');
+            if( $y < 2021 ) {
+                throw new ConfigBadParameterException('crypto_pbkdf2_expected_secure_to_year must be above 2021.');
+            }
+            $iterations = Crypto::getPBKDF2IterationCountForYear($y);
+            self::$parameters['encryption_password_hash_iterations_new_files'] = $iterations;
+        }
+        
         // verify classes are happy
         Guest::validateConfig();
         ClientLog::validateConfig();
